@@ -320,8 +320,8 @@ void CNavigation::ReadDataFromSensor()
     m_anglePitch = ypr[1];
     m_angleRoll = ypr[2];
 
-    m_acceleration.x = m_rawAcclX / 8192.0f;
-    m_acceleration.y = m_rawAcclY / 8192.0f;
-    m_acceleration.z = m_rawAcclZ / 8192.0f;
+    m_accelerationRaw.x = m_rawAcclX / 8192.0f;
+    m_accelerationRaw.y = m_rawAcclY / 8192.0f;
+    m_accelerationRaw.z = m_rawAcclZ / 8192.0f;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////

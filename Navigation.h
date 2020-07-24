@@ -33,7 +33,7 @@ public:
     void CalculateReadableData();
 
     // Получение данных
-    VectorFloat GetAcceleration() const { return m_acceleration; }
+    VectorFloat GetAcceleration() const { return m_accelerationFlt; }
 
     // Сырые данные с акселерометров
     int16_t     GetRawAcclX() const { return m_rawAcclX; }

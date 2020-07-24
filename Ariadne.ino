@@ -2,7 +2,7 @@
 
 #include <Timer.h>
 #include <Display.h>
-#include <Navigation.h>
+#include "Navigation.h"
 
 //#define DEBUG
 #define SHOW_RAW_DATA

@@ -16,10 +16,9 @@ static const uint16_t FILL_COLOR = CDisplay::COLOR_BLACK;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 CConsole::SItem::SItem() :
 	fltData( 0.0f ),
-
+	intData( 0 ),
 	posY( 0 ),
-	pString( nullptr ),
-	bWasInit( false )
+	pString( nullptr )
 {}
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 CConsole::CConsole( CDisplay *pDisplay ) :
@@ -46,11 +45,11 @@ void CConsole::RegisterText( const char *pString )
 	m_posY += TEXT_STEP_Y;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void CConsole::RegisterData( const EConsoleType type, const char *pString )
+void CConsole::RegisterData( const EConsoleType type, const EDataType dataType, const char *pString )
 {
 	m_item[type].posY = m_posY;
 	m_item[type].pString = pString;
-	m_item[type].bWasInit = true;
+	m_item[type].type = dataType;
 	m_posY += TEXT_STEP_Y;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +61,16 @@ void CConsole::RegisterSpace()
 void CConsole::SetWorkMode()
 {
 	m_pDisplay->SetTextColor( DATA_COLOR );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void CConsole::SetData( const EConsoleType type, const float data )
+{
+	if( DATA_TYPE_FLT == m_item[type].type )
+		m_item[type].fltData = data;
+	else if( DATA_TYPE_INT == m_item[type].type )
+		m_item[type].intData = data;
+	else if( DATA_TYPE_TIME == m_item[type].type )
+		m_item[type].intData = data;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CConsole::DrawHeader()
@@ -77,17 +86,21 @@ void CConsole::DrawHeader()
 void CConsole::DrawInfo()
 {
 	for( int i = 0; i < CONSOLE_TYPE_COUNT; ++i )
-		if( m_item[i].bWasInit )
+		if( DATA_TYPE_NONE != m_item[i].type )
 			m_pDisplay->DrawText( m_posX, m_item[i].posY, m_item[i].pString );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CConsole::DrawData()
 {
 	for( int i = 0; i < CONSOLE_TYPE_COUNT; ++i )
-		if( m_item[i].bWasInit )
+		if( DATA_TYPE_NONE != m_item[i].type )
 		{
-			// TODO: выбрать правильный тип
-			DrawData( m_item[i].posY, m_item[i].fltData );
+			if( DATA_TYPE_FLT == m_item[i].type )
+				DrawData( m_item[i].posY, m_item[i].fltData );
+			else if( DATA_TYPE_INT == m_item[i].type )
+				DrawData( m_item[i].posY, m_item[i].intData );
+			else if( DATA_TYPE_TIME == m_item[i].type )
+				DrawTime( m_item[i].posY, m_item[i].intData );
 		}
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,5 +126,36 @@ void CConsole::DrawData( const uint16_t y, const float value )
 {
 	m_pDisplay->FillRect( DATA_POS_X, y, CLEAR_SIZE_X, CLEAR_SIZE_Y, BACK_COLOR );
 	m_pDisplay->DrawFlt( DATA_POS_X, y, value );
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void CConsole::DrawTime( const uint16_t y, const int32_t timeSec )
+{
+	const int sec = timeSec % 60;
+	const int min = ( timeSec / 60 ) % 60;
+	const int hrs = ( timeSec / 3600 ) % 24;
+	const int day = timeSec / 86400;
+	const int n = sprintf( m_buffer, "%02d:%02d:%02d:%02d", day, hrs, min, sec );
+	m_pDisplay->FillRect( DATA_POS_X, y, CLEAR_SIZE_X, CLEAR_SIZE_Y, BACK_COLOR );
+	m_pDisplay->DrawText( DATA_POS_X, y, m_buffer );
+
+	/*
+	
+
+	m_pDisplay->DrawText( DATA_POS_X + TEXT_STEP_X * 2, y, ":" );
+	m_pDisplay->DrawText( DATA_POS_X + TEXT_STEP_X * 5, y, ":" );
+
+
+
+	m_pDisplay->DrawInt( DATA_POS_X, y, hrs );
+
+	if( min < 10 )
+	{
+		m_pDisplay->DrawText( DATA_POS_X + TEXT_STEP_X * 5, y, "0" );
+		m_pDisplay->DrawInt( DATA_POS_X + TEXT_STEP_X * 3, y, min );
+	}
+	else
+		m_pDisplay->DrawInt( DATA_POS_X + TEXT_STEP_X * 3, y, min );
+	m_pDisplay->DrawInt( DATA_POS_X + TEXT_STEP_X * 6, y, sec );
+	*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////

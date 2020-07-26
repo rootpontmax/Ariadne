@@ -149,6 +149,52 @@ void CPlatform::HandleData()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CPlatform::ReadDataFromSensor()
 {
+	Quaternion  q;              // [w, x, y, z]         quaternion container
+    VectorInt16 gyro;           // [x, y, z]            gyro sensor measurements
+    VectorInt16 aa;             // [x, y, z]            accel sensor measurements
+    VectorInt16 aaReal;         // [x, y, z]            gravity-free accel sensor measurements
+    VectorInt16 aaWorld;        // [x, y, z]            world-frame accel sensor measurements
+    VectorFloat gravity;        // [x, y, z]            gravity vector
+    //float ypr[3];               // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+
+    while( m_fifoCount >= m_packetSize )
+    {
+        g_device.getFIFOBytes( m_fifoBuffer, m_packetSize );
+        m_fifoCount -= m_packetSize;
+    
+        //m_device.dmpGetAccel( &aa, m_fifoBuffer );
+
+        g_device.dmpGetGyro( &gyro, m_fifoBuffer );
+        g_device.dmpGetQuaternion( &q, m_fifoBuffer );
+        g_device.dmpGetAccel( &aa, m_fifoBuffer );
+        g_device.dmpGetGravity( &gravity, &q );
+        g_device.dmpGetYawPitchRoll( m_ypr, &q, &gravity );
+        g_device.dmpGetLinearAccel( &aaReal, &aa, &gravity );
+        g_device.dmpGetLinearAccelInWorld( &aaWorld, &aaReal, &q );
+
+        m_ypr[0] *= 180.0f / M_PI;
+
+
+
+        // Добавляем значение в медианные фильтры
+        //m_filterGyroX.Add( gyro.x );
+        //m_filterGyroY.Add( gyro.y );
+        //m_filterGyroZ.Add( gyro.z );
+
+        //m_filterAcclX.Add( aaWorld.x );
+        //m_filterAcclY.Add( aaWorld.y );
+        //m_filterAcclZ.Add( aaWorld.z );
+
+        //m_filterAcclX.Add( aaReal.x );
+        //m_filterAcclY.Add( aaReal.y );
+        //m_filterAcclZ.Add( aaReal.z );
+
+        //m_filterAcclX.Add( aa.x );
+        //m_filterAcclY.Add( aa.y );
+        //m_filterAcclZ.Add( aa.z );
+    }
+
+
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////

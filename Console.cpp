@@ -133,29 +133,8 @@ void CConsole::DrawTime( const uint16_t y, const int32_t timeSec )
 	const int sec = timeSec % 60;
 	const int min = ( timeSec / 60 ) % 60;
 	const int hrs = ( timeSec / 3600 ) % 24;
-	const int day = timeSec / 86400;
-	const int n = sprintf( m_buffer, "%02d:%02d:%02d:%02d", day, hrs, min, sec );
+	const int n = sprintf( m_buffer, "%02d:%02d:%02d", hrs, min, sec );
 	m_pDisplay->FillRect( DATA_POS_X, y, CLEAR_SIZE_X, CLEAR_SIZE_Y, BACK_COLOR );
 	m_pDisplay->DrawText( DATA_POS_X, y, m_buffer );
-
-	/*
-	
-
-	m_pDisplay->DrawText( DATA_POS_X + TEXT_STEP_X * 2, y, ":" );
-	m_pDisplay->DrawText( DATA_POS_X + TEXT_STEP_X * 5, y, ":" );
-
-
-
-	m_pDisplay->DrawInt( DATA_POS_X, y, hrs );
-
-	if( min < 10 )
-	{
-		m_pDisplay->DrawText( DATA_POS_X + TEXT_STEP_X * 5, y, "0" );
-		m_pDisplay->DrawInt( DATA_POS_X + TEXT_STEP_X * 3, y, min );
-	}
-	else
-		m_pDisplay->DrawInt( DATA_POS_X + TEXT_STEP_X * 3, y, min );
-	m_pDisplay->DrawInt( DATA_POS_X + TEXT_STEP_X * 6, y, sec );
-	*/
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////

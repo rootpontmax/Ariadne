@@ -81,7 +81,7 @@ static void SetDataToConsole()
 {
 	const int32_t errorCount = g_platform.GetErrorCount();
     const int32_t sensorFreq = g_platform.GetSensorFreq();
-    const uint32_t uptimeSec = g_uptimeMicroSeconds / 1000000 + 86390; // for test
+    const uint32_t uptimeSec = g_uptimeMicroSeconds / 1000000;// + 86390; // for test
 
     g_console.SetData( CONSOLE_TYPE_FIFO_OVERFLOW_COUNT, errorCount );
     g_console.SetData( CONSOLE_TYPE_SYSTEM_FREQ, g_cyclesCount );

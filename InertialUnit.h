@@ -42,6 +42,8 @@ private:
 
 	// Working functions
 	void	ReadData();
+	void	ReadAccl();
+	void	ReadGyro();
 
 	// Acceleration: raw and normalized
 	int16_t	m_rawAcclX;
@@ -51,6 +53,10 @@ private:
 	int16_t	m_rawGyroX;
 	int16_t	m_rawGyroY;
 	int16_t	m_rawGyroZ;
+
+	float	m_gyroErrorX;
+	float	m_gyroErrorY;
+	float	m_gyroErrorZ;
 
 	float	m_acclX;
 	float	m_acclY;

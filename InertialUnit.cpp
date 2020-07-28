@@ -22,6 +22,10 @@ CInertialUnit::CInertialUnit() :
 	m_rawGyroY( 0 ),
 	m_rawGyroZ( 0 ),
 
+	m_gyroErrorX( 0.0f ),
+	m_gyroErrorY( 0.0f ),
+	m_gyroErrorZ( 0.0f ),
+
 	m_acclX( 0.0f ),
 	m_acclY( 0.0f ),
 	m_acclZ( 0.0f ),
@@ -39,7 +43,24 @@ void CInertialUnit::Init()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInertialUnit::Tick()
 {
-	ReadData();
+	//ReadData();
+	ReadAccl();
+	ReadGyro();
+
+  	// Get acceleration in C-system
+  	m_acclX = static_cast< float >( m_rawAcclX ) * ACCL_COEF;
+  	m_acclY = static_cast< float >( m_rawAcclY ) * ACCL_COEF;
+  	m_acclZ = static_cast< float >( m_rawAcclZ ) * ACCL_COEF;
+
+  	// Get gyroscope reading in C-system
+  	m_gyroX = static_cast< float >( m_rawGyroX ) * GYRO_COEF;
+  	m_gyroY = static_cast< float >( m_rawGyroY ) * GYRO_COEF;
+  	m_gyroZ = static_cast< float >( m_rawGyroZ ) * GYRO_COEF;
+
+  	// Compensate the error of gyroscope
+  	m_gyroX -= m_gyroErrorX;
+  	m_gyroY -= m_gyroErrorY;
+  	m_gyroZ -= m_gyroErrorZ;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInertialUnit::Setup()
@@ -64,14 +85,12 @@ void CInertialUnit::Setup()
   	//Wire.write( 0x10 ); 	// Set the register bits as 00010000 (+/- 8g full scale range)
   	Wire.endTransmission( true );
 
-  	/*
 	// Configure Gyro Sensitivity - Full Scale Range (default +/- 250deg/s)
   	Wire.beginTransmission( MPU_ADDRESS );
   	Wire.write( 0x1B );		// Talk to the GYRO_CONFIG register (1B hex)
   	Wire.write( 0x00 );     // Set the register bits as 00000000 (250deg/s full scale)
   	//Wire.write( 0x10 );     // Set the register bits as 00010000 (1000deg/s full scale)
   	Wire.endTransmission( true );
-  	*/
 
 	/*
                                               
@@ -107,28 +126,32 @@ void CInertialUnit::Setup()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInertialUnit::Calibrate()
 {
-	// CRAP
-	return;
-	// end of CRAP
+	const int count = 10000;
+	const float fltCount = static_cast< float >( count );
 
-	const int count = 1000;
 	int32_t gyroCalX = 0;
 	int32_t gyroCalY = 0;
 	int32_t gyroCalZ = 0;
 	for( int i = 0; i < count; ++i )
 	{
-		ReadData();
+		//ReadData();
+		ReadGyro();
 		gyroCalX += m_rawGyroX;
 		gyroCalY += m_rawGyroY;
 		gyroCalZ += m_rawGyroZ;
-
-		// Delay 3us to have 250Hz for-loop
-    	delay( 3 );  
 	}
 
-	Serial.print( "Gyro callibrate X: " );Serial.println( gyroCalX );
-	Serial.print( "Gyro callibrate Y: " );Serial.println( gyroCalY );
-	Serial.print( "Gyro callibrate Z: " );Serial.println( gyroCalZ );
+	Serial.print( "Gyro callibrate X summary: " );Serial.println( gyroCalX );
+	Serial.print( "Gyro callibrate Y summary: " );Serial.println( gyroCalY );
+	Serial.print( "Gyro callibrate Z summary: " );Serial.println( gyroCalZ );
+
+	m_gyroErrorX = static_cast< float >( gyroCalX ) * GYRO_COEF / fltCount;
+	m_gyroErrorY = static_cast< float >( gyroCalY ) * GYRO_COEF / fltCount;
+	m_gyroErrorZ = static_cast< float >( gyroCalZ ) * GYRO_COEF / fltCount;
+
+	Serial.print( "Gyro error X: " );Serial.println( m_gyroErrorX );
+	Serial.print( "Gyro error Y: " );Serial.println( m_gyroErrorY );
+	Serial.print( "Gyro error Z: " );Serial.println( m_gyroErrorZ );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInertialUnit::ReadData()
@@ -149,42 +172,37 @@ void CInertialUnit::ReadData()
   	m_rawAcclY = ( Wire.read() << 8 ) | Wire.read();
   	m_rawAcclZ = ( Wire.read() << 8 ) | Wire.read();
   	const int16_t temp = ( Wire.read() << 8 ) | Wire.read();                                   
-  	m_rawGyroX = Wire.read() << 8 | Wire.read();                                 
-  	m_rawGyroY = Wire.read() << 8 | Wire.read();                                 
+  	m_rawGyroX = Wire.read() << 8 | Wire.read();
+  	m_rawGyroY = Wire.read() << 8 | Wire.read();
   	m_rawGyroZ = Wire.read() << 8 | Wire.read();
-
-	/*
-	// Read the raw gyro and accelerometer data
-
-	// Start communicating with the MPU-6050
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void CInertialUnit::ReadAccl()
+{
+	// Read acceleration data
 	Wire.beginTransmission( MPU_ADDRESS );
-  	Wire.write(0x3B); // Send the requested starting register
-  	Wire.endTransmission(); 
+  	Wire.write( 0x3B ); // Start with register 0x3B (ACCEL_XOUT_H)
+  	Wire.endTransmission( false );
+  	Wire.requestFrom( MPU_ADDRESS, 6 );
+  	// Wait until all the bytes are received
+  	while( Wire.available() < 6 );
 
-  	// Request 14 bytes from the MPU-6050                                  
-  	Wire.requestFrom(0x68,14);
-  	// Wait until all the bytes are received                                       
-  	while( Wire.available() < 14 );
-  
-  	// Following statements left shift 8 bits, then bitwise OR.  
-  	// Turns two 8-bit values into one 16-bit value                                       
-  	m_rawAcclX = ( Wire.read() << 8 ) | Wire.read();                                  
-  	m_rawAcclX = ( Wire.read() << 8 ) | Wire.read();                                  
   	m_rawAcclX = ( Wire.read() << 8 ) | Wire.read();
-  	const int16_t temp = ( Wire.read() << 8 ) | Wire.read();                                   
-  	m_gyroX = Wire.read() <<8 | Wire.read();                                 
-  	m_gyroY = Wire.read() <<8 | Wire.read();                                 
-  	m_gyroZ = Wire.read() <<8 | Wire.read();
-  	*/
+  	m_rawAcclY = ( Wire.read() << 8 ) | Wire.read();
+  	m_rawAcclZ = ( Wire.read() << 8 ) | Wire.read();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void CInertialUnit::ReadGyro()
+{
+	Wire.beginTransmission( MPU_ADDRESS );
+    Wire.write( 0x43 ); // Gyro data first register address 0x43
+    Wire.endTransmission( false );
 
-  	// Get acceleration in C-system
-  	m_acclX = static_cast< float >( m_rawAcclX ) * ACCL_COEF;
-  	m_acclY = static_cast< float >( m_rawAcclY ) * ACCL_COEF;
-  	m_acclZ = static_cast< float >( m_rawAcclZ ) * ACCL_COEF;
+    Wire.requestFrom( MPU_ADDRESS, 6 );
+    while( Wire.available() < 6 );
 
-  	// Get gyroscope reading in C-system
-  	m_gyroX = static_cast< float >( m_rawGyroX ) * GYRO_COEF;
-  	m_gyroY = static_cast< float >( m_rawGyroY ) * GYRO_COEF;
-  	m_gyroZ = static_cast< float >( m_rawGyroZ ) * GYRO_COEF;
+    m_rawGyroX = Wire.read() << 8 | Wire.read();
+  	m_rawGyroY = Wire.read() << 8 | Wire.read();
+  	m_rawGyroZ = Wire.read() << 8 | Wire.read();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////

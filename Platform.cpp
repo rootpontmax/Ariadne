@@ -113,11 +113,13 @@ void CPlatform::Init()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CPlatform::Tick( const uint64_t microSec )
 {
+	m_device.Tick();
+    return;
+    
 	if( !m_bWasInit )
         return;
 
-    m_device.Tick();
-    return;
+
 
     // Если было прерывание, то надо посчитать кол-во готовых данных, и сбросить флаг готовности
     if( g_bIsInterrupt )

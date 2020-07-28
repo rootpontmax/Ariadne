@@ -42,6 +42,10 @@ public:
 	float	GetAcclX() const { return m_device.GetAcclX(); }
 	float	GetAcclY() const { return m_device.GetAcclY(); }
 	float	GetAcclZ() const { return m_device.GetAcclZ(); }
+
+	float	GetGyroX() const { return m_device.GetGyroX(); }
+	float	GetGyroY() const { return m_device.GetGyroY(); }
+	float	GetGyroZ() const { return m_device.GetGyroZ(); }
 	// end of CRAP
 
 

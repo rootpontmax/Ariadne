@@ -21,13 +21,18 @@ public:
 	int16_t	GetRawAcclY() const { return m_rawAcclY; }
 	int16_t	GetRawAcclZ() const { return m_rawAcclZ; }
 
+	int16_t	GetRawGyroX() const { return m_rawGyroX; }
+	int16_t	GetRawGyroY() const { return m_rawGyroY; }
+	int16_t	GetRawGyroZ() const { return m_rawGyroZ; }
+
+
 	float	GetAcclX() const { return m_acclX; }
 	float 	GetAcclY() const { return m_acclY; }
 	float	GetAcclZ() const { return m_acclZ; }
 
-	int16_t	GetRawGyroX() const { return m_gyroX; }
-	int16_t	GetRawGyroY() const { return m_gyroY; }
-	int16_t	GetRawGyroZ() const { return m_gyroZ; }
+	float	GetGyroX() const { return m_gyroX; }
+	float 	GetGyroY() const { return m_gyroY; }
+	float	GetGyroZ() const { return m_gyroZ; }
 
 private:
 
@@ -43,13 +48,17 @@ private:
 	int16_t	m_rawAcclY;
 	int16_t	m_rawAcclZ;
 
+	int16_t	m_rawGyroX;
+	int16_t	m_rawGyroY;
+	int16_t	m_rawGyroZ;
+
 	float	m_acclX;
 	float	m_acclY;
 	float	m_acclZ;
 
-	int16_t	m_gyroX;
-	int16_t	m_gyroY;
-	int16_t	m_gyroZ;
+	float	m_gyroX;
+	float	m_gyroY;
+	float	m_gyroZ;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif

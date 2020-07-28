@@ -17,13 +17,17 @@ public:
 	void	Init();
 	void	Tick();
 
-	int16_t	GetAcclX() const { return m_acclX; }
-	int16_t	GetAcclY() const { return m_acclY; }
-	int16_t	GetAcclZ() const { return m_acclZ; }
+	int16_t	GetRawAcclX() const { return m_rawAcclX; }
+	int16_t	GetRawAcclY() const { return m_rawAcclY; }
+	int16_t	GetRawAcclZ() const { return m_rawAcclZ; }
 
-	int16_t	GetGyroX() const { return m_gyroX; }
-	int16_t	GetGyroY() const { return m_gyroY; }
-	int16_t	GetGyroZ() const { return m_gyroZ; }
+	float	GetAcclX() const { return m_acclX; }
+	float 	GetAcclY() const { return m_acclY; }
+	float	GetAcclZ() const { return m_acclZ; }
+
+	int16_t	GetRawGyroX() const { return m_gyroX; }
+	int16_t	GetRawGyroY() const { return m_gyroY; }
+	int16_t	GetRawGyroZ() const { return m_gyroZ; }
 
 private:
 
@@ -34,9 +38,14 @@ private:
 	// Working functions
 	void	ReadData();
 
-	int16_t	m_acclX;
-	int16_t	m_acclY;
-	int16_t	m_acclZ;
+	// Acceleration: raw and normalized
+	int16_t	m_rawAcclX;
+	int16_t	m_rawAcclY;
+	int16_t	m_rawAcclZ;
+
+	float	m_acclX;
+	float	m_acclY;
+	float	m_acclZ;
 
 	int16_t	m_gyroX;
 	int16_t	m_gyroY;

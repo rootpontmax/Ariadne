@@ -10,10 +10,20 @@ class CDisplay;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 enum EConsoleType
 {
-	// Raw acceleration system
-	CONSOLE_TYPE_RAW_ACCEL_X,
-	CONSOLE_TYPE_RAW_ACCEL_Y,
-	CONSOLE_TYPE_RAW_ACCEL_Z,
+	// Raw acceleration
+	CONSOLE_TYPE_RAW_ACCL_X,
+	CONSOLE_TYPE_RAW_ACCL_Y,
+	CONSOLE_TYPE_RAW_ACCL_Z,
+
+	// Raw gyroscope
+	CONSOLE_TYPE_RAW_GYRO_X,
+	CONSOLE_TYPE_RAW_GYRO_Y,
+	CONSOLE_TYPE_RAW_GYRO_Z,
+
+	// Acceleration
+	CONSOLE_TYPE_ACCL_X,
+	CONSOLE_TYPE_ACCL_Y,
+	CONSOLE_TYPE_ACCL_Z,
 
 	// Angles
 	CONSOLE_TYPE_ANGLE_YAW,

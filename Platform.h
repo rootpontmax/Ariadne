@@ -30,13 +30,18 @@ public:
 	bool WasInit() const { return m_bWasInit; }
 
 	// CRAP
-	int16_t	GetAcclX() const { return m_device.GetAcclX(); }
-	int16_t	GetAcclY() const { return m_device.GetAcclY(); }
-	int16_t	GetAcclZ() const { return m_device.GetAcclZ(); }
+	int16_t	GetRawAcclX() const { return m_device.GetRawAcclX(); }
+	int16_t	GetRawAcclY() const { return m_device.GetRawAcclY(); }
+	int16_t	GetRawAcclZ() const { return m_device.GetRawAcclZ(); }
 
-	int16_t	GetGyroX() const { return m_device.GetGyroX(); }
-	int16_t	GetGyroY() const { return m_device.GetGyroY(); }
-	int16_t	GetGyroZ() const { return m_device.GetGyroZ(); }
+	int16_t	GetRawGyroX() const { return m_device.GetRawGyroX(); }
+	int16_t	GetRawGyroY() const { return m_device.GetRawGyroY(); }
+	int16_t	GetRawGyroZ() const { return m_device.GetRawGyroZ(); }
+
+
+	float	GetAcclX() const { return m_device.GetAcclX(); }
+	float	GetAcclY() const { return m_device.GetAcclY(); }
+	float	GetAcclZ() const { return m_device.GetAcclZ(); }
 	// end of CRAP
 
 

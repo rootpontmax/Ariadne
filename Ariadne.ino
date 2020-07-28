@@ -44,13 +44,23 @@ static void InitConsole()
 	g_console.DrawHeader();
 
 #ifdef SHOW_RAW_DATA
-	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_X, DATA_TYPE_INT, "Raw acceleration X" );
-	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_Y, DATA_TYPE_INT, "Raw acceleration Y" );
-	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_Z, DATA_TYPE_INT, "Raw acceleration Z" );
+	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCL_X, DATA_TYPE_INT, "Raw acceleration X" );
+	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCL_Y, DATA_TYPE_INT, "Raw acceleration Y" );
+	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCL_Z, DATA_TYPE_INT, "Raw acceleration Z" );
+	g_console.RegisterSpace();
+
+	g_console.RegisterData( CONSOLE_TYPE_RAW_GYRO_X, DATA_TYPE_INT, "Raw gyroscope X" );
+	g_console.RegisterData( CONSOLE_TYPE_RAW_GYRO_Y, DATA_TYPE_INT, "Raw gyroscope Y" );
+	g_console.RegisterData( CONSOLE_TYPE_RAW_GYRO_Z, DATA_TYPE_INT, "Raw gyroscope Z" );
 	g_console.RegisterSpace();
 #else
 
 #endif
+
+	g_console.RegisterData( CONSOLE_TYPE_ACCL_X, DATA_TYPE_FLT, "Acceleration X (m/s2)" );
+	g_console.RegisterData( CONSOLE_TYPE_ACCL_Y, DATA_TYPE_FLT, "Acceleration Y (m/s2)" );
+	g_console.RegisterData( CONSOLE_TYPE_ACCL_Z, DATA_TYPE_FLT, "Acceleration Z (m/s2)" );
+	g_console.RegisterSpace();
 
 	/*
 	// Angles
@@ -71,13 +81,27 @@ static void SetDataToConsole()
 {
 	// Raw data
 #ifdef SHOW_RAW_DATA
-	const int16_t acclX = g_platform.GetAcclX();
-	const int16_t acclY = g_platform.GetAcclY();
-	const int16_t acclZ = g_platform.GetAcclZ();
-	g_console.SetData( CONSOLE_TYPE_RAW_ACCEL_X, acclX );
-	g_console.SetData( CONSOLE_TYPE_RAW_ACCEL_Y, acclY );
-	g_console.SetData( CONSOLE_TYPE_RAW_ACCEL_Z, acclZ );
+	const int16_t rawAcclX = g_platform.GetRawAcclX();
+	const int16_t rawAcclY = g_platform.GetRawAcclY();
+	const int16_t rawAcclZ = g_platform.GetRawAcclZ();
+	g_console.SetData( CONSOLE_TYPE_RAW_ACCL_X, rawAcclX );
+	g_console.SetData( CONSOLE_TYPE_RAW_ACCL_Y, rawAcclY );
+	g_console.SetData( CONSOLE_TYPE_RAW_ACCL_Z, rawAcclZ );
+
+	const int16_t gyroX = g_platform.GetRawGyroX();
+	const int16_t gyroY = g_platform.GetRawGyroY();
+	const int16_t gyroZ = g_platform.GetRawGyroZ();
+	g_console.SetData( CONSOLE_TYPE_RAW_GYRO_X, gyroX );
+	g_console.SetData( CONSOLE_TYPE_RAW_GYRO_Y, gyroY );
+	g_console.SetData( CONSOLE_TYPE_RAW_GYRO_Z, gyroZ );
 #endif
+
+	const float acclX = g_platform.GetAcclX();
+	const float acclY = g_platform.GetAcclY();
+	const float acclZ = g_platform.GetAcclZ();
+	g_console.SetData( CONSOLE_TYPE_ACCL_X, acclX );
+	g_console.SetData( CONSOLE_TYPE_ACCL_Y, acclY );
+	g_console.SetData( CONSOLE_TYPE_ACCL_Z, acclZ );
 
 	/*
 	// Angle section
@@ -103,6 +127,7 @@ static void SetDataToConsole()
 void setup()
 {
 	Serial.begin( 115200 );
+	Serial.println("----------------------------------------");
 
 	g_console.Init();
 	g_platform.Init();

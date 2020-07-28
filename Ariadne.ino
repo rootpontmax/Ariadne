@@ -44,19 +44,21 @@ static void InitConsole()
 	g_console.DrawHeader();
 
 #ifdef SHOW_RAW_DATA
-	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_X, DATA_TYPE_FLT, "Raw acceleration X" );
-	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_Y, DATA_TYPE_FLT, "Raw acceleration Y" );
-	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_Z, DATA_TYPE_FLT, "Raw acceleration Z" );
+	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_X, DATA_TYPE_INT, "Raw acceleration X" );
+	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_Y, DATA_TYPE_INT, "Raw acceleration Y" );
+	g_console.RegisterData( CONSOLE_TYPE_RAW_ACCEL_Z, DATA_TYPE_INT, "Raw acceleration Z" );
 	g_console.RegisterSpace();
 #else
 
 #endif
 
+	/*
 	// Angles
 	g_console.RegisterData( CONSOLE_TYPE_ANGLE_YAW, DATA_TYPE_FLT, "Yaw" );
 	g_console.RegisterData( CONSOLE_TYPE_ANGLE_PITCH, DATA_TYPE_FLT, "Pitch" );
 	g_console.RegisterData( CONSOLE_TYPE_ANGLE_ROLL, DATA_TYPE_FLT, "Roll" );
 	g_console.RegisterSpace();
+	*/
 
 	// System section
 	g_console.RegisterData( CONSOLE_TYPE_FIFO_OVERFLOW_COUNT, DATA_TYPE_INT, "Errors count" );
@@ -67,6 +69,17 @@ static void InitConsole()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 static void SetDataToConsole()
 {
+	// Raw data
+#ifdef SHOW_RAW_DATA
+	const int16_t acclX = g_platform.GetAcclX();
+	const int16_t acclY = g_platform.GetAcclY();
+	const int16_t acclZ = g_platform.GetAcclZ();
+	g_console.SetData( CONSOLE_TYPE_RAW_ACCEL_X, acclX );
+	g_console.SetData( CONSOLE_TYPE_RAW_ACCEL_Y, acclY );
+	g_console.SetData( CONSOLE_TYPE_RAW_ACCEL_Z, acclZ );
+#endif
+
+	/*
 	// Angle section
 	const float angleYaw = g_platform.GetYaw();
     const float anglePitch = g_platform.GetPitch();
@@ -74,6 +87,7 @@ static void SetDataToConsole()
     g_console.SetData( CONSOLE_TYPE_ANGLE_YAW, angleYaw );
     g_console.SetData( CONSOLE_TYPE_ANGLE_PITCH, anglePitch );
     g_console.SetData( CONSOLE_TYPE_ANGLE_ROLL, angleRoll );
+    */
 
     // System section
 	const int32_t errorCount = g_platform.GetErrorCount();
@@ -114,7 +128,7 @@ void loop()
 	g_uptimeMicroSeconds += deltaTimeMicroSeconds;
 
 	// Tick the navigation system
-	g_platform.Tick( deltaTimeMicroSeconds );
+	//g_platform.Tick( deltaTimeMicroSeconds );
 
 	// Show information once a second
 	if( g_fpsTimer.IsReady() )

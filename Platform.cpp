@@ -28,6 +28,13 @@ CPlatform::CPlatform() :
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CPlatform::Init()
 {	
+	m_device.Init();
+
+	// CRAP
+	m_bWasInit = true;
+	return;
+	// end of CRAP
+
 	// join I2C bus (I2Cdev library doesn't do this automatically)
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     Wire.begin();
@@ -108,6 +115,9 @@ void CPlatform::Tick( const uint64_t microSec )
 {
 	if( !m_bWasInit )
         return;
+
+    m_device.Tick();
+    return;
 
     // Если было прерывание, то надо посчитать кол-во готовых данных, и сбросить флаг готовности
     if( g_bIsInterrupt )

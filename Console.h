@@ -37,11 +37,8 @@ enum EConsoleType
 	CONSOLE_TYPE_ANGLE_ROLL,
 
 	// System section
-	CONSOLE_TYPE_FIFO_OVERFLOW_COUNT,
 	CONSOLE_TYPE_SYSTEM_FREQ,
-	CONSOLE_TYPE_SENSOR_FREQ,
 	CONSOLE_TYPE_UPTIME_SEC,
-
 	CONSOLE_TYPE_COUNT
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////

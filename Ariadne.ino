@@ -77,9 +77,7 @@ static void InitConsole()
 	*/
 
 	// System section
-	g_console.RegisterData( CONSOLE_TYPE_FIFO_OVERFLOW_COUNT, DATA_TYPE_INT, "Errors count" );
 	g_console.RegisterData( CONSOLE_TYPE_SYSTEM_FREQ, DATA_TYPE_INT, "System freq (Hz)" );
-	g_console.RegisterData( CONSOLE_TYPE_SENSOR_FREQ, DATA_TYPE_INT, "Sensor freq (Hz)" );
 	g_console.RegisterData( CONSOLE_TYPE_UPTIME_SEC, DATA_TYPE_TIME, "Uptime (HH:MM:SS)" );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,13 +129,8 @@ static void SetDataToConsole()
     */
 
     // System section
-	const int32_t errorCount = g_platform.GetErrorCount();
-    const int32_t sensorFreq = g_platform.GetSensorFreq();
     const uint32_t uptimeSec = g_uptimeMicroSeconds / 1000000;// + 86390; // for test
-
-    g_console.SetData( CONSOLE_TYPE_FIFO_OVERFLOW_COUNT, errorCount );
     g_console.SetData( CONSOLE_TYPE_SYSTEM_FREQ, g_cyclesCount );
-    g_console.SetData( CONSOLE_TYPE_SENSOR_FREQ, sensorFreq );
     g_console.SetData( CONSOLE_TYPE_UPTIME_SEC, uptimeSec );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////

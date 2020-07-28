@@ -2,6 +2,7 @@
 
 #include <Timer.h>
 #include <Display.h>
+#include "InertialUnit.h"
 #include "Platform.h"
 
 //#define DEBUG
@@ -13,31 +14,12 @@ CTimer			g_fpsTimer( true );
 CTimer			g_screenTimer( true );
 CDisplay		g_display;
 CConsole		g_console( &g_display );
-CPlatform		g_platform;
+CInertialUnit	g_inertialUnit;
+CPlatform		g_platform( &g_inertialUnit );
 int32_t	 		g_cyclesCount = 0;
 uint64_t		g_timeMicroSeconds;
 uint64_t		g_uptimeMicroSeconds = 0;
 uint64_t		g_uptimeCyclesCounts = 0;
-////////////////////////////////////////////////////////////////////////////////////////////////////
-uint16_t		g_posAclX;
-uint16_t		g_posAclY;
-uint16_t		g_posAclZ;
-uint16_t		g_posAclS;
-
-uint16_t		g_posSpdX;
-uint16_t		g_posSpdY;
-uint16_t		g_posSpdZ;
-uint16_t		g_posSpdS;
-uint16_t		g_posSpdK;
-
-uint16_t		g_posPosX;
-uint16_t		g_posPosY;
-uint16_t		g_posPosZ;
-uint16_t		g_posDist;
-
-uint16_t		g_posSystemFreq;
-uint16_t		g_posSensorFreq;
-uint16_t		g_posErrorCount;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 static void InitConsole()
 {
@@ -68,13 +50,16 @@ static void InitConsole()
 	g_console.RegisterData( CONSOLE_TYPE_GYRO_Z, DATA_TYPE_FLT, "Gyroscope Z (deg/s)" );
 	g_console.RegisterSpace();
 
-	/*
-	// Angles
-	g_console.RegisterData( CONSOLE_TYPE_ANGLE_YAW, DATA_TYPE_FLT, "Yaw" );
-	g_console.RegisterData( CONSOLE_TYPE_ANGLE_PITCH, DATA_TYPE_FLT, "Pitch" );
-	g_console.RegisterData( CONSOLE_TYPE_ANGLE_ROLL, DATA_TYPE_FLT, "Roll" );
+	g_console.RegisterData( CONSOLE_TYPE_ANGLE_SPEED_X, DATA_TYPE_FLT, "Angle speed X (deg/s)" );
+	g_console.RegisterData( CONSOLE_TYPE_ANGLE_SPEED_Y, DATA_TYPE_FLT, "Angle speed Y (deg/s)" );
+	g_console.RegisterData( CONSOLE_TYPE_ANGLE_SPEED_Z, DATA_TYPE_FLT, "Angle speed Z (deg/s)" );
 	g_console.RegisterSpace();
-	*/
+	
+	// Angles
+	g_console.RegisterData( CONSOLE_TYPE_ANGLE_X, DATA_TYPE_FLT, "Angle X (deg)" );
+	g_console.RegisterData( CONSOLE_TYPE_ANGLE_Y, DATA_TYPE_FLT, "Angle Y (deg)" );
+	g_console.RegisterData( CONSOLE_TYPE_ANGLE_Z, DATA_TYPE_FLT, "Angle Z (deg)" );
+	g_console.RegisterSpace();
 
 	// System section
 	g_console.RegisterData( CONSOLE_TYPE_SYSTEM_FREQ, DATA_TYPE_INT, "System freq (Hz)" );
@@ -85,36 +70,41 @@ static void SetDataToConsole()
 {
 	// Raw data
 #ifdef SHOW_RAW_DATA
-	const int16_t rawAcclX = g_platform.GetRawAcclX();
-	const int16_t rawAcclY = g_platform.GetRawAcclY();
-	const int16_t rawAcclZ = g_platform.GetRawAcclZ();
+	const int16_t rawAcclX = g_inertialUnit.GetRawAcclX();
+	const int16_t rawAcclY = g_inertialUnit.GetRawAcclY();
+	const int16_t rawAcclZ = g_inertialUnit.GetRawAcclZ();
 	g_console.SetData( CONSOLE_TYPE_RAW_ACCL_X, rawAcclX );
 	g_console.SetData( CONSOLE_TYPE_RAW_ACCL_Y, rawAcclY );
 	g_console.SetData( CONSOLE_TYPE_RAW_ACCL_Z, rawAcclZ );
 
-	const int16_t rawGyroX = g_platform.GetRawGyroX();
-	const int16_t rawGyroY = g_platform.GetRawGyroY();
-	const int16_t rawGyroZ = g_platform.GetRawGyroZ();
+	const int16_t rawGyroX = g_inertialUnit.GetRawGyroX();
+	const int16_t rawGyroY = g_inertialUnit.GetRawGyroY();
+	const int16_t rawGyroZ = g_inertialUnit.GetRawGyroZ();
 	g_console.SetData( CONSOLE_TYPE_RAW_GYRO_X, rawGyroX );
 	g_console.SetData( CONSOLE_TYPE_RAW_GYRO_Y, rawGyroY );
 	g_console.SetData( CONSOLE_TYPE_RAW_GYRO_Z, rawGyroZ );
 #endif
 
-	const float acclX = g_platform.GetAcclX();
-	const float acclY = g_platform.GetAcclY();
-	const float acclZ = g_platform.GetAcclZ();
+	const float acclX = g_inertialUnit.GetAcclX();
+	const float acclY = g_inertialUnit.GetAcclY();
+	const float acclZ = g_inertialUnit.GetAcclZ();
 	const float acclModule = sqrt( acclX * acclX + acclY * acclY + acclZ * acclZ );
 	g_console.SetData( CONSOLE_TYPE_ACCL_X, acclX );
 	g_console.SetData( CONSOLE_TYPE_ACCL_Y, acclY );
 	g_console.SetData( CONSOLE_TYPE_ACCL_Z, acclZ );
 	g_console.SetData( CONSOLE_TYPE_ACCL_MODULE, acclModule );
 
-	const float gyroX = g_platform.GetGyroX();
-	const float gyroY = g_platform.GetGyroY();
-	const float gyroZ = g_platform.GetGyroZ();
-	g_console.SetData( CONSOLE_TYPE_GYRO_X, gyroX );
-	g_console.SetData( CONSOLE_TYPE_GYRO_Y, gyroY );
-	g_console.SetData( CONSOLE_TYPE_GYRO_Z, gyroZ );
+	g_console.SetData( CONSOLE_TYPE_GYRO_X, g_inertialUnit.GetGyroX() );
+	g_console.SetData( CONSOLE_TYPE_GYRO_Y, g_inertialUnit.GetGyroY() );
+	g_console.SetData( CONSOLE_TYPE_GYRO_Z, g_inertialUnit.GetGyroZ() );
+
+	g_console.SetData( CONSOLE_TYPE_ANGLE_SPEED_X, g_platform.GetAngleSpeedX() );
+	g_console.SetData( CONSOLE_TYPE_ANGLE_SPEED_Y, g_platform.GetAngleSpeedY() );
+	g_console.SetData( CONSOLE_TYPE_ANGLE_SPEED_Z, g_platform.GetAngleSpeedZ() );
+
+	g_console.SetData( CONSOLE_TYPE_ANGLE_X, g_platform.GetAngleX() );
+	g_console.SetData( CONSOLE_TYPE_ANGLE_Y, g_platform.GetAngleY() );
+	g_console.SetData( CONSOLE_TYPE_ANGLE_Z, g_platform.GetAngleZ() );
 
 
 
@@ -140,10 +130,7 @@ void setup()
 	Serial.println("----------------------------------------");
 
 	g_console.Init();
-	g_platform.Init();
-
-	if( !g_platform.WasInit() )
-		return;
+	g_inertialUnit.Init();
 	
 	InitConsole();
 	g_console.DrawInfo();
@@ -162,8 +149,10 @@ void loop()
 	g_timeMicroSeconds = thisTimeMicrosSeconds;
 	g_uptimeMicroSeconds += deltaTimeMicroSeconds;
 
+	const float timeSec = static_cast< float >( deltaTimeMicroSeconds ) / 1000000.0f;
+
 	// Tick the navigation system
-	g_platform.Tick( deltaTimeMicroSeconds );
+	g_platform.Tick( timeSec );
 
 	// Show information once a second
 	if( g_fpsTimer.IsReady() )
@@ -171,7 +160,6 @@ void loop()
 		SetDataToConsole();
 		g_console.DrawData();
 		g_cyclesCount = 0;
-		g_platform.ResetSensorFreqCounter();
 	}
 	++g_cyclesCount;
 	++g_uptimeCyclesCounts;

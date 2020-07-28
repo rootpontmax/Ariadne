@@ -4,73 +4,42 @@
 #ifndef ARIADNE_PLATFORM_H
 #define ARIADNE_PLATFORM_H
 
-#include "InertialUnit.h"
+#include <Arduino.h>
+#include <MedianFilter3.h>
 
-#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-#include <Wire.h>
-#endif
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
+class CInertialUnit;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class CPlatform
 {
 public:
-	CPlatform();
+	CPlatform( CInertialUnit *pDevice );
 
-	void Init();
-	void Tick( const uint64_t microSec );
-	void ResetSensorFreqCounter();
+	void Tick( const float timeSec );
 
-	// Получение данных
-    int32_t GetErrorCount() const { return m_errorCount; }
-    int32_t GetSensorFreq() const { return m_sensorFreq; }
-    float 	GetYaw() const { return m_ypr[0]; }
-    float 	GetPitch() const { return m_ypr[1]; }
-    float 	GetRoll() const { return m_ypr[2]; }
-	bool WasInit() const { return m_bWasInit; }
+	float	GetAngleSpeedX() const { return m_angleSpeedX; }
+	float	GetAngleSpeedY() const { return m_angleSpeedY; }
+	float	GetAngleSpeedZ() const { return m_angleSpeedZ; }
 
-	// CRAP
-	int16_t	GetRawAcclX() const { return m_device.GetRawAcclX(); }
-	int16_t	GetRawAcclY() const { return m_device.GetRawAcclY(); }
-	int16_t	GetRawAcclZ() const { return m_device.GetRawAcclZ(); }
-
-	int16_t	GetRawGyroX() const { return m_device.GetRawGyroX(); }
-	int16_t	GetRawGyroY() const { return m_device.GetRawGyroY(); }
-	int16_t	GetRawGyroZ() const { return m_device.GetRawGyroZ(); }
-
-
-	float	GetAcclX() const { return m_device.GetAcclX(); }
-	float	GetAcclY() const { return m_device.GetAcclY(); }
-	float	GetAcclZ() const { return m_device.GetAcclZ(); }
-
-	float	GetGyroX() const { return m_device.GetGyroX(); }
-	float	GetGyroY() const { return m_device.GetGyroY(); }
-	float	GetGyroZ() const { return m_device.GetGyroZ(); }
-	// end of CRAP
-
+	float	GetAngleX() const { return m_angleX; }
+	float	GetAngleY() const { return m_angleY; }
+	float	GetAngleZ() const { return m_angleZ; }
 
 private:
 
-	// Секция работы с датчиком
-    void    HandleData();
-    void    ReadDataFromSensor();
+	CMedianFilter3< float >	m_angleSpeedFilterX;
+	CMedianFilter3< float >	m_angleSpeedFilterY;
+	CMedianFilter3< float >	m_angleSpeedFilterZ;
 
-    CInertialUnit	m_device;
+	float m_angleSpeedX;
+	float m_angleSpeedY;
+	float m_angleSpeedZ;
 
-    uint8_t     m_fifoBuffer[64]; // FIFO storage buffer
+	float m_angleX;
+	float m_angleY;
+	float m_angleZ;
 
-	int32_t     m_sensorFreq;	// Частота опроса датчиков
-	int32_t     m_errorCount;	// Число ошибок
-    uint16_t    m_packetSize;	// Данные для чтения датчиков
-    uint16_t    m_fifoCount;    // count of all bytes currently in FIFO
-
-    // Параметры ориентации
-    float 		m_ypr[3];	// [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-
-
-    // Флаги
-    bool        m_bWasInit;
-	
+	CInertialUnit * const m_pDevice;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif

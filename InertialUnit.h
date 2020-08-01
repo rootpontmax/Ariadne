@@ -8,6 +8,7 @@
 #include <Wire.h>
 #endif
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class CInertialUnit
 {
@@ -31,7 +32,7 @@ public:
 	float	GetAcclZ() const { return m_acclZ; }
 
 	float	GetGyroX() const { return m_gyroX; }
-	float 	GetGyroY() const { return m_gyroY; }
+	float	GetGyroY() const { return m_gyroY; }
 	float	GetGyroZ() const { return m_gyroZ; }
 
 private:
@@ -40,10 +41,16 @@ private:
 	void 	Setup();
 	void	Calibrate();
 
+	// Calibrate function
+	float	CalcGyroError( float *pBuffer );
+
 	// Working functions
 	void	ReadData();
 	void	ReadAccl();
 	void	ReadGyro();
+
+	// Convert functions
+	void	ConvertGyro();
 
 	// Acceleration: raw and normalized
 	int16_t	m_rawAcclX;

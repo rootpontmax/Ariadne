@@ -126,8 +126,9 @@ static void SetDataToConsole()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void setup()
 {
+	//Serial.begin( 9600 );
 	Serial.begin( 115200 );
-	Serial.println("----------------------------------------");
+	//Serial.println("----------------------------------------");
 
 	g_console.Init();
 	g_inertialUnit.Init();
@@ -163,5 +164,10 @@ void loop()
 	}
 	++g_cyclesCount;
 	++g_uptimeCyclesCounts;
+
+	// CRAP
+	//delay(3);
+	// end of CRAP
+	//Serial.println();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////

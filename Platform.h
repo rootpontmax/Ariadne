@@ -5,6 +5,7 @@
 #define ARIADNE_PLATFORM_H
 
 #include <Arduino.h>
+#include <AverageFilter.h>
 #include <MedianFilter3.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,9 +28,16 @@ public:
 
 private:
 
-	CMedianFilter3< float >	m_angleSpeedFilterX;
-	CMedianFilter3< float >	m_angleSpeedFilterY;
-	CMedianFilter3< float >	m_angleSpeedFilterZ;
+	static const int AVERAGE_FILTER_GYRO = 5;
+
+	
+	CAverageFilter< float, AVERAGE_FILTER_GYRO > m_angleSpeedAverageFilterX;
+	CAverageFilter< float, AVERAGE_FILTER_GYRO > m_angleSpeedAverageFilterY;
+	CAverageFilter< float, AVERAGE_FILTER_GYRO > m_angleSpeedAverageFilterZ;
+
+	CMedianFilter3< float >	m_angleSpeedMedianFilterX;
+	CMedianFilter3< float >	m_angleSpeedMedianFilterY;
+	CMedianFilter3< float >	m_angleSpeedMedianFilterZ;
 
 	float m_angleSpeedX;
 	float m_angleSpeedY;
